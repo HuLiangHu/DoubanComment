@@ -8,7 +8,7 @@ from ..simulation_login import simulogin
 import time
 import random
 
-#登陆,豆瓣账号密码
+#登陆
 username = ''
 password = ''
 
@@ -56,9 +56,9 @@ class DoubanSpider(scrapy.Spider):
 
 # #测试代码
 #     def start_requests(self):
-#         for page in range(11,25):
-#             moviename = '扶摇'
-#             movieid = '26640097'
+#         for page in range(0,25):
+#             moviename = '延禧攻略'
+#             movieid = '26999852'
 #             start_urls = [
 #                 'https://movie.douban.com/subject/{0}/comments?start={1}&limit=20&sort=new_score&status=P'.format(
 #                     str(movieid), str(page * 20)),
@@ -74,8 +74,8 @@ class DoubanSpider(scrapy.Spider):
 #             for url in start_urls:
 #                 yield scrapy.Request(url=url, meta={'name': moviename, 'movieId': movieid}, callback=self.parse_detail,
 #                                                       dont_filter=True,headers=self.headers,cookies=cookies)
-
-
+#
+#所有热门
     def start_requests(self):
         """
         热门电视列表
@@ -98,7 +98,7 @@ class DoubanSpider(scrapy.Spider):
             #base_url = item['url'] + 'comments?start={}&limit=20&sort=new_score&status=P'
             movieid =re.search('(\d+)',item['url']).group(1)
 
-            for page in range(25):#评论详情页
+            for page in range(11):#评论详情页
                 start_urls = [
                     'https://movie.douban.com/subject/{0}/comments?start={1}&limit=20&sort=new_score&status=P'.format(
                         str(movieid), str(page * 20)),
@@ -132,7 +132,7 @@ class DoubanSpider(scrapy.Spider):
             item['comment_time'] = re.sub('\n', '', comment_time).strip()
 
             item['authorId']=content.xpath('h3/span[@class="comment-info"]/a/@href').re('https://www.douban.com/people/(.*)/')[0]
-
+            item['commentId'] = content.xpath('h3/span/input/@value').extract_first()
             item['movieId']=response.meta['movieId']
             item['ctime'] = str(datetime.now())
             item['votes'] = content.xpath('h3//span[@class="votes"]/text()').extract_first()
